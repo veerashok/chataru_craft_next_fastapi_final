@@ -1,5 +1,4 @@
-import CatalogTabs from "@/components/CatalogTabs";
-
+import CatalogTabs from "../../components/CatalogTabs";
 export const dynamic = "force-dynamic"; // prevents caching for fresh product fetch
 
 export default async function CatalogPage() {
