@@ -1,9 +1,17 @@
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    appDir: true,
+  reactStrictMode: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**",
+      },
+    ],
   },
+  env: {
+    NEXT_PUBLIC_API_BASE: process.env.NEXT_PUBLIC_API_BASE,
+  }
 };
 
-module.exports = nextConfig;
+export default nextConfig;
