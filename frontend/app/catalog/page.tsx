@@ -1,4 +1,4 @@
-import CatalogTabs from "@/components/CatalogTabs";
+import CatalogTabs from "../../components/CatalogTabs";
 
 export const dynamic = "force-dynamic"; // always fetch fresh products
 
