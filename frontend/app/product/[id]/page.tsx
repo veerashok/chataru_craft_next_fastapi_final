@@ -9,7 +9,6 @@ type PageProps = {
 
 const apiBase = process.env.NEXT_PUBLIC_API_BASE || "";
 
-// Same helper as in ProductCard (can be shared if you prefer)
 function getImageUrl(image?: string | null): string {
   if (!image) return "/no-image.png";
   if (image.startsWith("http://") || image.startsWith("https://")) return image;
@@ -64,21 +63,26 @@ export default async function ProductPage({ params }: PageProps) {
     console.error("NEXT_PUBLIC_API_BASE is not set");
   }
 
-  const res = await fetch(`${apiBase}/api/products/${id}`, { cache: "no-store" });
+  // ✅ Use the same endpoint as catalog
+  const res = await fetch(`${apiBase}/api/products`, { cache: "no-store" });
 
   if (!res.ok) {
-    // If product not found, show 404 page
     return notFound();
   }
 
-  const product: Product = await res.json();
+  const products: Product[] = await res.json();
+  const product = products.find((p) => String(p.id) === id);
+
+  if (!product) {
+    return notFound();
+  }
+
   const imgUrl = getImageUrl(product.image);
   const categoryLabel = inferCategoryLabel(product);
   const badge = getBadge(product);
 
-  // WhatsApp CTA – set your number via env or hardcode
   const whatsappNumber =
-    process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "91xxxxxxxxxx"; // <-- put your full number with country code
+    process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "91xxxxxxxxxx"; // change this
   const waMessage = encodeURIComponent(
     `Hi, I'm interested in "${product.name}" (ID: ${product.id}) from Chataru Craft. Please share details.`
   );
@@ -121,7 +125,6 @@ export default async function ProductPage({ params }: PageProps) {
                 </div>
               </div>
 
-              {/* Small caption */}
               <p className="mt-2 text-[11px] text-slate-500">
                 Images are representative; minor variations may occur in handcrafted items.
               </p>
@@ -129,7 +132,6 @@ export default async function ProductPage({ params }: PageProps) {
 
             {/* Details side */}
             <div className="flex flex-col gap-3">
-              {/* Category chip */}
               <div className="inline-flex items-center w-fit rounded-full bg-amber-50 px-3 py-1 border border-amber-200">
                 <span className="h-1.5 w-1.5 rounded-full bg-amber-500 mr-1.5" />
                 <span className="text-[11px] font-semibold uppercase tracking-wide text-amber-700">
@@ -153,7 +155,6 @@ export default async function ProductPage({ params }: PageProps) {
                 </p>
               )}
 
-              {/* Extra info section – you can adapt as needed */}
               <div className="mt-2 grid gap-2 text-xs text-slate-600 sm:grid-cols-2">
                 <div>
                   <div className="font-semibold text-slate-800">Origin</div>
@@ -165,7 +166,6 @@ export default async function ProductPage({ params }: PageProps) {
                 </div>
               </div>
 
-              {/* CTA buttons */}
               <div className="mt-4 flex flex-col sm:flex-row gap-3">
                 <a
                   href={whatsappLink}
@@ -188,7 +188,6 @@ export default async function ProductPage({ params }: PageProps) {
           </div>
         </div>
 
-        {/* Small footer text */}
         <div className="mt-8 text-center text-[11px] text-slate-500">
           © Chataru Craft · Boss Enterprises · Village Lakhe Ka Tala, Ramjan Ki
           Gafan, Barmer, Rajasthan
