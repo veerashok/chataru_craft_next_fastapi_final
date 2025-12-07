@@ -316,7 +316,7 @@ export default function AdminPage() {
                     void saveProduct(p.id, e.currentTarget);
                   }}
                 >
-                  <td>
+
                     {p.image && (
                       <img
                         src={
@@ -328,7 +328,7 @@ export default function AdminPage() {
                         style={{ maxWidth: 80, borderRadius: 4 }}
                       />
                     )}
-                  </td>
+          
 
                   <div className="flex items-center justify-between text-[11px] text-slate-500">
                     <span>ID: {p.id}</span>
