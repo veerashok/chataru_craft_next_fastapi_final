@@ -3,15 +3,15 @@ module.exports = {
   content: [
     "./app/**/*.{js,ts,jsx,tsx}",
     "./components/**/*.{js,ts,jsx,tsx}",
+    "./pages/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
       colors: {
-        primary: "#b45309",      // Amber / desert brown
-        secondary: "#facc15",    // Yellow / golden
-        sand: "#f8f5ef",         // Soft desert background
-        dark: "#1f2937",         // Slate / deep neutral
-      },
+        sand: "#f8f5f1",
+        dark: "#2b2118",
+        primary: "#8b5a2b",
+      }
     },
   },
   plugins: [],
