@@ -15,11 +15,11 @@ export default async function CatalogPage() {
         </h1>
 
         <p className="text-center text-dark/80 max-w-2xl mx-auto mb-8 mt-3 text-sm sm:text-base">
-          Hand embroidery, dry vegetables like Ker &amp; Sangari, and authentic
-          handicrafts from Barmer.
+          Hand embroidery, dry vegetables like Ker &amp; Sangari, and authentic handicrafts from Barmer.
         </p>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+        {/* Grid controls card size */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
           {products.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
