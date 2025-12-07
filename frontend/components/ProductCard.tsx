@@ -16,6 +16,7 @@ export type Product = {
 const apiBase = process.env.NEXT_PUBLIC_API_BASE || "";
 const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "";
 
+// Build final image URL
 function getImageUrl(image?: string | null): string {
   if (!image) return "/no-image.png";
 
@@ -28,10 +29,10 @@ function getImageUrl(image?: string | null): string {
   return `${base}${path}`;
 }
 
+// Category label
 function inferCategoryLabel(p: Product): string {
   const raw = (p.category || "").toString().toLowerCase();
   const text = `${p.name || ""} ${p.description || ""}`.toLowerCase();
-
   const src = raw || text;
 
   if (
@@ -51,14 +52,7 @@ function inferCategoryLabel(p: Product): string {
   return "Embroidery / Textile";
 }
 
-function getBadge(p: Product): string | null {
-  const text = `${p.name || ""} ${p.description || ""}`.toLowerCase();
-  if (text.includes("new")) return "New";
-  if (text.includes("best")) return "Best Seller";
-  if (text.includes("popular") || text.includes("famous")) return "Popular";
-  return null;
-}
-
+// WhatsApp link
 function getWhatsAppLink(p: Product): string | null {
   if (!whatsappNumber) return null;
   const cleaned = whatsappNumber.replace(/[^0-9]/g, "");
@@ -69,60 +63,70 @@ function getWhatsAppLink(p: Product): string | null {
   return `https://wa.me/${cleaned}?text=${encoded}`;
 }
 
-type ProductCardProps = {
+type Props = {
   product: Product;
 };
 
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+const ProductCard: React.FC<Props> = ({ product }) => {
   const imgUrl = getImageUrl(product.image);
-  const categoryLabel = inferCategoryLabel(product);
-  const badge = getBadge(product);
+  const category = inferCategoryLabel(product);
   const waLink = getWhatsAppLink(product);
 
   return (
-    <Link
-      href={`/product/${product.id}`}
-      className="block h-full"
-      prefetch={false}
-    >
+    <Link href={`/product/${product.id}`} className="block h-full" prefetch={false}>
       <motion.div
-        whileHover={{ scale: 1.03, translateY: -3 }}
-        transition={{ duration: 0.18 }}
-        className="group h-full flex flex-col bg-white rounded-2xl shadow-sm hover:shadow-2xl border border-gray-100 overflow-hidden"
+        whileHover={{ scale: 1.02, translateY: -3 }}
+        transition={{ duration: 0.16 }}
+        className="
+          h-full flex flex-col
+          rounded-2xl border border-orange-100
+          bg-white/95
+          shadow-sm hover:shadow-lg
+          overflow-hidden
+        "
       >
-        {/* IMAGE AREA – fixed aspect, nice crop, aligned rows */}
+        {/* IMAGE AREA – smaller & consistent */}
         <div className="relative w-full bg-sand/70">
-          {/* square-ish aspect so all cards align */}
-          <div className="relative w-full aspect-[4/5] overflow-hidden">
+          {/* use 3:4 aspect so cards aren’t too tall */}
+          <div className="relative w-full pt-[75%] overflow-hidden">
             <img
               src={imgUrl}
               alt={product.name}
               loading="lazy"
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+              className="
+                absolute inset-0 w-full h-full
+                object-cover
+                transition-transform duration-300 ease-out
+                hover:scale-105
+              "
             />
           </div>
 
-          {/* badge */}
-          {badge && (
-            <span className="absolute top-2 left-2 z-10 text-[10px] font-semibold px-2 py-1 rounded-full bg-secondary text-dark shadow-sm">
-              {badge}
-            </span>
-          )}
+          {/* small gradient at bottom for nicer look */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/15 to-transparent" />
         </div>
 
         {/* TEXT AREA */}
-        <div className="flex-1 flex flex-col p-3">
-          <div className="text-[11px] uppercase tracking-wide text-secondary">
-            {categoryLabel}
+        <div className="flex-1 flex flex-col gap-1.5 p-3">
+          {/* colorful category chip */}
+          <div className="inline-flex w-fit items-center gap-1 rounded-full bg-secondary/15 px-2 py-0.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-secondary" />
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-secondary">
+              {category}
+            </span>
           </div>
 
-          <div className="mt-1 text-sm font-semibold line-clamp-2 flex-1">
+          {/* name */}
+          <div className="text-sm font-semibold text-dark line-clamp-2 flex-1">
             {product.name}
           </div>
 
-          <div className="mt-1 text-xs text-gray-700">₹{product.price}</div>
+          {/* price */}
+          <div className="text-xs font-bold text-primary">
+            ₹{product.price}
+          </div>
 
-          {/* WhatsApp button (small) */}
+          {/* WhatsApp button */}
           {waLink && (
             <button
               type="button"
@@ -131,7 +135,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 e.stopPropagation();
                 window.open(waLink, "_blank");
               }}
-              className="mt-2 inline-flex items-center justify-center text-[11px] px-3 py-1 rounded-full bg-accent text-white font-medium hover:bg-primary transition-colors"
+              className="
+                mt-2 inline-flex items-center justify-center
+                text-[11px] px-3 py-1 rounded-full
+                bg-accent text-white font-medium
+                hover:bg-primary
+                transition-colors
+              "
             >
               Order on WhatsApp
             </button>
