@@ -29,23 +29,19 @@ export default function ProductCard({ product }: { product: Product }) {
   return (
     <Link href={`/product/${product.id}`} className="block group" prefetch={false}>
       <article className="h-full flex flex-col rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition overflow-hidden">
-        {/* IMAGE AREA – layout + max-height control it, image doesn't dictate card */}
+        {/* 🔒 FIXED IMAGE SLOT INSIDE THE CARD */}
         <div className="w-full bg-gray-50 flex items-center justify-center px-3 pt-3 pb-2">
-          <img
-            src={imgUrl}
-            alt={product.name}
-            loading="lazy"
-            className="
-              w-full h-auto
-              max-h-56
-              object-contain
-              transition-transform duration-300
-              group-hover:scale-105
-            "
-          />
+          <div className="w-full h-48 flex items-center justify-center overflow-hidden">
+            <img
+              src={imgUrl}
+              alt={product.name}
+              loading="lazy"
+              className="max-w-full max-h-full object-contain"
+            />
+          </div>
         </div>
 
-        {/* TEXT AREA – similar to Woodsala: name + price */}
+        {/* TEXT AREA */}
         <div className="flex-1 flex flex-col gap-1 px-3 pb-3 pt-1">
           <h3 className="text-sm font-semibold text-slate-900 line-clamp-2 group-hover:text-primary">
             {product.name}
