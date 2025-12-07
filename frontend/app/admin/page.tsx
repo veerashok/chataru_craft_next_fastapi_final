@@ -313,14 +313,13 @@ export default function AdminPage() {
                   }}
                 >
                   {p.image && (
-                    <Image
-                      src={p.image}
-                      alt={p.name}
-                      width={500}
-                      height={500}
-                      className="h-40 w-full rounded-xl object-cover"
-                    />
-                  )}
+  <img
+    src={p.image}
+    alt={p.name}
+    className="h-40 w-full rounded-xl object-cover"
+  />
+)}
+
 
                   <div className="flex items-center justify-between text-[11px] text-slate-500">
                     <span>ID: {p.id}</span>
