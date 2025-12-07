@@ -316,15 +316,19 @@ export default function AdminPage() {
                     void saveProduct(p.id, e.currentTarget);
                   }}
                 >
-                  <td>
+
                     {p.image && (
                       <img
-                        src={imgUrl}
+                        src={
+                          p.image.startsWith("http")
+                            ? p.image
+                            : `${API_BASE}${p.image}`
+                        }
                         alt={p.name}
                         className="h-28 w-auto rounded-md object-cover border"
                       />
                     )}
-                  </td>
+          
 
                   <div className="flex items-center justify-between text-[11px] text-slate-500">
                     <span>ID: {p.id}</span>
