@@ -27,12 +27,10 @@ const apiBase = process.env.NEXT_PUBLIC_API_BASE || "";
 function getImageUrl(image: string | undefined | null): string {
   if (!image) return "/no-image.png"; // optional placeholder
 
-  // If backend already returns full URL
   if (image.startsWith("http://") || image.startsWith("https://")) {
     return image;
   }
 
-  // Ensure single slash between base and path
   const base = apiBase.replace(/\/+$/, "");
   const path = image.startsWith("/") ? image : `/${image}`;
   return `${base}${path}`;
@@ -40,8 +38,6 @@ function getImageUrl(image: string | undefined | null): string {
 
 /**
  * Try to infer category on frontend based on product fields.
- * If your backend later adds a proper `category` field,
- * this will still work (it prefers p.category).
  */
 function inferCategory(p: Product): string {
   if (p.category) {
@@ -56,7 +52,6 @@ function inferCategory(p: Product): string {
   const desc = (p.description || "").toLowerCase();
   const text = `${name} ${desc}`;
 
-  // Dry vegetables (Ker, Sangari, etc.)
   if (
     text.includes("ker") ||
     text.includes("sangari") ||
@@ -67,7 +62,6 @@ function inferCategory(p: Product): string {
     return "dry";
   }
 
-  // Wood craft
   if (
     text.includes("wood") ||
     text.includes("sheesham") ||
@@ -77,7 +71,6 @@ function inferCategory(p: Product): string {
     return "wood";
   }
 
-  // Metal / stone items
   if (
     text.includes("brass") ||
     text.includes("metal") ||
@@ -87,7 +80,6 @@ function inferCategory(p: Product): string {
     return "metal";
   }
 
-  // Default: embroidery / textile
   return "embroidery";
 }
 
@@ -106,7 +98,7 @@ export default function CatalogTabs({ products }: { products: Product[] }) {
           <button
             key={c.id}
             onClick={() => setCategory(c.id)}
-            className={`whitespace-nowrap px-4 py-2 rounded-full border transition
+            className={`whitespace-nowrap px-4 py-2 rounded-full border text-sm sm:text-base transition
               ${
                 category === c.id
                   ? "bg-primary text-white border-primary shadow-lg"
@@ -129,23 +121,33 @@ export default function CatalogTabs({ products }: { products: Product[] }) {
       >
         {filtered.map((p) => (
           <motion.div
-            whileHover={{ scale: 1.03 }}
+            whileHover={{ scale: 1.03, translateY: -2 }}
             key={p.id}
-            className="bg-white rounded-xl shadow-sm hover:shadow-xl p-3 cursor-pointer border border-gray-100"
+            className="bg-white rounded-2xl shadow-sm hover:shadow-2xl p-3 cursor-pointer border border-gray-100 flex flex-col"
           >
-            <div className="relative overflow-hidden rounded-lg">
+            {/* Image wrapper: keeps proportion, no distortion */}
+            <div className="w-full aspect-[4/5] bg-sand/60 rounded-xl overflow-hidden flex items-center justify-center">
               <img
                 src={getImageUrl(p.image)}
-                className="w-full h-40 object-cover rounded-lg"
+                className="max-h-full max-w-full object-contain"
                 alt={p.name}
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 hover:opacity-100 transition" />
             </div>
-            <div className="mt-2 text-sm font-semibold line-clamp-2">
-              {p.name}
+
+            {/* Text */}
+            <div className="mt-3 flex flex-col gap-1">
+              <div className="text-xs uppercase tracking-wide text-secondary">
+                {inferCategory(p) === "dry" && "Dry Vegetable"}
+                {inferCategory(p) === "embroidery" && "Embroidery / Textile"}
+                {inferCategory(p) === "wood" && "Wooden Handicraft"}
+                {inferCategory(p) === "metal" && "Metal / Stone Art"}
+              </div>
+              <div className="text-sm font-semibold line-clamp-2">
+                {p.name}
+              </div>
+              <div className="text-xs text-gray-600 mt-1">₹{p.price}</div>
             </div>
-            <div className="text-xs text-gray-500 mt-1">₹{p.price}</div>
           </motion.div>
         ))}
 
@@ -158,3 +160,4 @@ export default function CatalogTabs({ products }: { products: Product[] }) {
     </div>
   );
 }
+
