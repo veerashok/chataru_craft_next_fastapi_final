@@ -65,7 +65,7 @@ const CatalogGrid: React.FC<CatalogGridProps> = ({ products }) => {
       </div>
 
       {/* Grid of cards */}
-      <div className="<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5 py-4">">
+      <div className="<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5 py-4">
         {filtered.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
