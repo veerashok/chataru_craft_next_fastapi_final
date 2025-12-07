@@ -60,4 +60,3 @@ export default function SiteHeader() {
     </header>
   );
 }
-SiteHeader.tsx
