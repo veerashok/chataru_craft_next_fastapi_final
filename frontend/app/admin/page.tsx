@@ -207,7 +207,9 @@ export default function AdminPage() {
               Admin Access
             </div>
             <div className="mt-1 text-sm text-slate-800">
-              {isLoggedIn ? "You are logged in." : "Login to add or edit products."}
+              {isLoggedIn
+                ? "You are logged in."
+                : "Login to add or edit products."}
             </div>
             <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
               <input
@@ -274,7 +276,9 @@ export default function AdminPage() {
                 required
                 className="rounded border border-slate-300 px-3 py-2 text-sm"
               />
-              <span>Upload clear image (your standard size) — layout will adapt.</span>
+              <span>
+                Upload clear image (your standard size) — layout will adapt.
+              </span>
             </div>
             <button
               type="submit"
@@ -313,19 +317,18 @@ export default function AdminPage() {
                   }}
                 >
                   <td>
-  {p.image && (
-    <img
-      src={
-        p.image.startsWith("http")
-          ? p.image
-          : `${API_BASE}${p.image}`
-      }
-      alt={p.name}
-      style={{ maxWidth: 80, borderRadius: 4 }}
-    />
-  )}
-</td>
-
+                    {p.image && (
+                      <img
+                        src={
+                          p.image.startsWith("http")
+                            ? p.image
+                            : `${API_BASE}${p.image}`
+                        }
+                        alt={p.name}
+                        style={{ maxWidth: 80, borderRadius: 4 }}
+                      />
+                    )}
+                  </td>
 
                   <div className="flex items-center justify-between text-[11px] text-slate-500">
                     <span>ID: {p.id}</span>
