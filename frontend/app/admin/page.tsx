@@ -1,9 +1,12 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE;
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE ??
+  "https://chataru-craft-backend-production.up.railway.app";
 
 type Product = {
   id: number;
@@ -20,142 +23,71 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
 
   async function login() {
-    setStatus("Logging in...");
-    try {
-      const res = await fetch(`${API_BASE}/api/admin/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ password }),
-      });
-      if (!res.ok) {
-        setStatus("Wrong password");
-        return;
-      }
-      setStatus("Logged in");
-      await loadProducts();
-    } catch (err) {
-      console.error(err);
-      setStatus("Login failed");
-    }
+    setStatus("Logging in…");
+    const res = await fetch(`${API_BASE}/api/admin/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ password }),
+    });
+    if (!res.ok) return setStatus("Wrong password ❌");
+    setStatus("Logged in ✔");
+    loadProducts();
   }
 
   async function logout() {
-    try {
-      await fetch(`${API_BASE}/api/admin/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
-      setProducts([]);
-      setStatus("Logged out");
-    } catch (err) {
-      console.error(err);
-      setStatus("Logout failed");
-    }
+    await fetch(`${API_BASE}/api/admin/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+    setProducts([]);
+    setStatus("Logged out");
   }
 
   async function loadProducts() {
     setLoading(true);
-    setStatus("Loading products...");
-    try {
-      const res = await fetch(`${API_BASE}/api/products`, {
-        credentials: "include",
-      });
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      setProducts(data);
-      setStatus(`Loaded ${data.length} product(s).`);
-    } catch (err) {
-      console.error(err);
-      setStatus("Failed to load products.");
-    } finally {
-      setLoading(false);
-    }
+    const res = await fetch(`${API_BASE}/api/products`, {
+      credentials: "include",
+    });
+    const data = await res.json();
+    setProducts(data);
+    setLoading(false);
   }
 
-  async function handleAdd(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const form = e.currentTarget;
+  async function saveProduct(p: Product, form: HTMLFormElement) {
     const fd = new FormData(form);
-
-    try {
-      const res = await fetch(`${API_BASE}/api/admin/products`, {
-        method: "POST",
-        body: fd,
-        credentials: "include",
-      });
-      if (res.status === 401) {
-        setStatus("Please login first.");
-        return;
-      }
-      if (!res.ok) throw new Error();
-      setStatus("Product added.");
-      form.reset();
-      await loadProducts();
-    } catch (err) {
-      console.error(err);
-      setStatus("Failed to add product.");
-    }
+    const res = await fetch(`${API_BASE}/api/admin/products/${p.id}`, {
+      method: "PUT",
+      body: fd,
+      credentials: "include",
+    });
+    if (!res.ok) return setStatus("Save failed ❌");
+    setStatus("Saved ✔");
+    loadProducts();
   }
 
-  async function handleRowAction(
-    id: number,
-    action: "save" | "delete",
-    rowEl: HTMLTableRowElement
-  ) {
-    if (action === "delete") {
-      if (!confirm("Delete this product?")) return;
-      try {
-        const res = await fetch(`${API_BASE}/api/admin/products/${id}`, {
-          method: "DELETE",
-          credentials: "include",
-        });
-        if (res.status === 401) {
-          setStatus("Please login first.");
-          return;
-        }
-        if (!res.ok) throw new Error();
-        setStatus("Product deleted.");
-        await loadProducts();
-      } catch (err) {
-        console.error(err);
-        setStatus("Failed to delete product.");
-      }
-      return;
-    }
+  async function deleteProduct(id: number) {
+    if (!confirm("Delete product?")) return;
+    const res = await fetch(`${API_BASE}/api/admin/products/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    if (!res.ok) return setStatus("Delete failed ❌");
+    setStatus("Deleted ✔");
+    loadProducts();
+  }
 
-    const nameInput = rowEl.querySelector<HTMLInputElement>('input[data-field="name"]');
-    const priceInput = rowEl.querySelector<HTMLInputElement>('input[data-field="price"]');
-    const descInput = rowEl.querySelector<HTMLTextAreaElement>('textarea[data-field="description"]');
-    const imageInput = rowEl.querySelector<HTMLInputElement>('input[data-field="image"]');
-
-    if (!nameInput || !priceInput || !descInput || !imageInput) return;
-
-    const fd = new FormData();
-    fd.append("name", nameInput.value);
-    fd.append("price", priceInput.value);
-    fd.append("description", descInput.value);
-    if (imageInput.files && imageInput.files[0]) {
-      fd.append("image", imageInput.files[0]);
-    }
-
-    try {
-      const res = await fetch(`${API_BASE}/api/admin/products/${id}`, {
-        method: "PUT",
-        body: fd,
-        credentials: "include",
-      });
-      if (res.status === 401) {
-        setStatus("Please login first.");
-        return;
-      }
-      if (!res.ok) throw new Error();
-      setStatus("Product updated.");
-      await loadProducts();
-    } catch (err) {
-      console.error(err);
-      setStatus("Failed to update product.");
-    }
+  async function addProduct(form: HTMLFormElement) {
+    const fd = new FormData(form);
+    const res = await fetch(`${API_BASE}/api/admin/products`, {
+      method: "POST",
+      body: fd,
+      credentials: "include",
+    });
+    if (!res.ok) return setStatus("Add failed ❌");
+    form.reset();
+    setStatus("Product added ✔");
+    loadProducts();
   }
 
   useEffect(() => {
@@ -163,123 +95,116 @@ export default function AdminPage() {
   }, []);
 
   return (
-    <div className="container" style={{ padding: "2rem 0" }}>
-      <h1>Admin – Product catalogue</h1>
-      <div style={{ marginBottom: "1rem", display: "flex", gap: "0.75rem", alignItems: "center", flexWrap: "wrap" }}>
-        <label>
-          Admin password:&nbsp;
+    <main className="min-h-screen bg-slate-50">
+      {/* Header */}
+      <header className="sticky top-0 z-30 border-b border-amber-100 bg-white/80 backdrop-blur-md">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-3 py-3">
+          <Link href="/admin" className="flex items-center gap-2">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-amber-700 text-xs font-semibold text-white shadow-sm">
+              CC
+            </div>
+            <div className="text-sm font-semibold text-slate-900">
+              Chataru Craft — Admin Panel
+            </div>
+          </Link>
+          <button
+            onClick={logout}
+            className="rounded-full border border-red-300 bg-red-50 px-3 py-1 text-[12px] font-medium text-red-700 hover:bg-red-100"
+          >
+            Logout
+          </button>
+        </div>
+      </header>
+
+      {/* Login panel (only if logged out) */}
+      {products.length === 0 && (
+        <section className="mx-auto mt-10 max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow">
+          <h2 className="text-lg font-semibold mb-3">Admin Login</h2>
           <input
             type="password"
             value={password}
-            onChange={e => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             placeholder="ADMIN_PASSWORD"
+            className="w-full rounded border px-3 py-2 mb-3 text-sm"
           />
-        </label>
-        <button className="btn btn-primary" onClick={login}>Login</button>
-        <button className="btn btn-outline" onClick={logout}>Logout</button>
-        <span style={{ fontSize: "0.8rem", color: "#6b5b4b" }}>{status}</span>
-      </div>
-
-      <section>
-        <h2>Add new product</h2>
-        <form onSubmit={handleAdd}>
-          <table>
-            <tbody>
-              <tr>
-                <td>Name</td>
-                <td><input name="name" required /></td>
-              </tr>
-              <tr>
-                <td>Price (₹)</td>
-                <td><input name="price" type="number" min={0} required /></td>
-              </tr>
-              <tr>
-                <td>Description</td>
-                <td><textarea name="description" rows={3} /></td>
-              </tr>
-              <tr>
-                <td>Image</td>
-                <td>
-                  <input name="image" type="file" accept="image/*" required />
-                  <div className="note">Image will be uploaded to backend /uploads.</div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <button type="submit" className="btn btn-primary" style={{ marginTop: "0.5rem" }}>
-            Add product
+          <button
+            onClick={login}
+            className="w-full rounded bg-amber-700 py-2 text-sm font-medium text-white hover:bg-amber-800"
+          >
+            Login
           </button>
-        </form>
-      </section>
+          <p className="mt-2 text-xs text-center text-slate-500">{status}</p>
+        </section>
+      )}
 
-      <section style={{ marginTop: "2rem" }}>
-        <h2>Existing products</h2>
-        {loading ? (
-          <p>Loading…</p>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Preview</th>
-                <th>Name</th>
-                <th>Price (₹)</th>
-                <th>Description</th>
-                <th>Change image</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody
-              id="productRows"
-              onClick={e => {
-                const target = e.target as HTMLElement;
-                const btn = target.closest("button");
-                if (!btn) return;
-                const action = btn.getAttribute("data-action") as "save" | "delete" | null;
-                const idAttr = btn.getAttribute("data-id");
-                if (!action || !idAttr) return;
-                const id = parseInt(idAttr, 10);
-                const rowEl = btn.closest("tr") as HTMLTableRowElement | null;
-                if (!rowEl) return;
-                void handleRowAction(id, action, rowEl);
+      {/* Products & Add form */}
+      {products.length > 0 && (
+        <section className="mx-auto max-w-6xl px-3 py-6 space-y-10">
+          {/* Add new product */}
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow">
+            <h3 className="text-lg font-semibold mb-4">Add new product</h3>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                addProduct(e.currentTarget);
               }}
+              className="grid grid-cols-1 gap-3 sm:grid-cols-2"
             >
-              {products.map(p => (
-                <tr key={p.id}>
-                  <td>{p.id}</td>
-                  <td>{p.image && <img src={p.image} alt={p.name} style={{ maxWidth: 80 }} />}</td>
-                  <td><input defaultValue={p.name} data-field="name" /></td>
-                  <td><input type="number" defaultValue={String(p.price)} data-field="price" /></td>
-                  <td><textarea rows={3} defaultValue={p.description || ""} data-field="description" /></td>
-                  <td>
-                    <input type="file" accept="image/*" data-field="image" />
-                    <div className="note">Leave empty to keep current image</div>
-                  </td>
-                  <td>
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      data-action="save"
-                      data-id={p.id}
-                    >
-                      Save
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-outline"
-                      data-action="delete"
-                      data-id={p.id}
-                      style={{ marginLeft: 4 }}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </section>
-    </div>
+              <input name="name" placeholder="Product name" required className="rounded border px-3 py-2" />
+              <input name="price" type="number" min="0" placeholder="Price (₹)" required className="rounded border px-3 py-2" />
+              <textarea name="description" rows={3} placeholder="Description" className="col-span-full rounded border px-3 py-2" />
+              <input name="image" type="file" accept="image/*" required className="rounded border px-3 py-2" />
+              <button className="col-span-full rounded bg-amber-700 py-2 text-sm font-medium text-white hover:bg-amber-800">
+                ➕ Add product
+              </button>
+            </form>
+            <p className="text-xs mt-2 text-slate-500">{status}</p>
+          </div>
+
+          {/* Product cards */}
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {products.map((p) => (
+              <form
+                key={p.id}
+                className="rounded-2xl border border-slate-200 bg-white p-4 shadow space-y-3"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  saveProduct(p, e.currentTarget);
+                }}
+              >
+                <Image
+                  src={p.image}
+                  alt={p.name}
+                  width={500}
+                  height={500}
+                  className="h-40 w-full rounded object-cover"
+                />
+                <input className="w-full rounded border px-3 py-2 text-sm" name="name" defaultValue={p.name} />
+                <input className="w-full rounded border px-3 py-2 text-sm" type="number" name="price" defaultValue={p.price} />
+                <textarea className="w-full rounded border px-3 py-2 text-sm" rows={3} name="description" defaultValue={p.description || ""} />
+                <input className="w-full rounded border px-3 py-2 text-sm" type="file" accept="image/*" name="image" />
+                <div className="flex gap-2 pt-1">
+                  <button className="flex-1 rounded bg-amber-700 py-2 text-xs font-medium text-white hover:bg-amber-800">
+                    💾 Save
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => deleteProduct(p.id)}
+                    className="flex-1 rounded border border-red-300 bg-red-50 py-2 text-xs font-medium text-red-700 hover:bg-red-100"
+                  >
+                    ❌ Delete
+                  </button>
+                </div>
+              </form>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Footer */}
+      <footer className="mt-10 border-t bg-white py-6 text-center text-xs text-slate-500">
+        Chataru Craft · Boss Enterprises — Admin Panel
+      </footer>
+    </main>
   );
 }
