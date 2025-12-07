@@ -69,14 +69,14 @@ export default function ProductCard({ product }: { product: Product }) {
   return (
     <Link href={`/product/${product.id}`} className="block group" prefetch={false}>
       <article className="relative h-full flex flex-col rounded-xl border border-orange-100 bg-white shadow-sm hover:shadow-lg transition overflow-hidden">
-        {/* Small corner badge */}
+        {/* Corner badge */}
         {badge && (
           <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full bg-secondary/90 text-[10px] font-semibold text-dark shadow-sm">
             {badge}
           </div>
         )}
 
-        {/* 🔒 FIXED IMAGE SLOT (kept same: h-48) */}
+        {/* 🔒 FIXED IMAGE SLOT (same as before) */}
         <div className="w-full bg-gray-50 flex items-center justify-center px-3 pt-3 pb-2">
           <div className="w-full h-48 flex items-center justify-center overflow-hidden">
             <img
@@ -88,7 +88,7 @@ export default function ProductCard({ product }: { product: Product }) {
           </div>
         </div>
 
-        {/* TEXT AREA – prettier, like catalog.html style */}
+        {/* TEXT AREA */}
         <div className="flex-1 flex flex-col gap-1.5 px-3 pb-3 pt-1">
           {/* Category chip */}
           <div className="inline-flex items-center w-fit rounded-full bg-secondary/10 px-2 py-0.5">
@@ -98,19 +98,16 @@ export default function ProductCard({ product }: { product: Product }) {
             </span>
           </div>
 
-          {/* Name */}
           <h3 className="text-sm font-semibold text-slate-900 line-clamp-2 group-hover:text-primary">
             {product.name}
           </h3>
 
-          {/* Short description (optional) */}
           {product.description && (
             <p className="text-[11px] text-slate-500 line-clamp-2">
               {product.description}
             </p>
           )}
 
-          {/* Price + subtle “view details” row */}
           <div className="mt-1 flex items-center justify-between">
             <div className="text-sm font-bold text-primary">
               ₹ {product.price}
