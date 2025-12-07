@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import ProductCard, { Product } from "@/components/ProductCard";
 
 const CATEGORIES = [
+  { id: "all", label: "All Products" },
   { id: "embroidery", label: "Embroidery & Textile" },
   { id: "dry", label: "Dry Vegetables (Ker & Sangari)" },
   { id: "wood", label: "Wooden Handicraft" },
@@ -23,23 +24,23 @@ function inferCategoryKey(p: Product): string {
   ) {
     return "dry";
   }
-  if (src.includes("wood") || src.includes("sheesham") || src.includes("teak")) {
+  if (src.includes("wood") || src.includes("sheesham") || src.includes("teak") || src.includes("bed") || src.includes("sofa")) {
     return "wood";
   }
   if (src.includes("metal") || src.includes("stone") || src.includes("brass")) {
     return "metal";
   }
+  if (src.includes("embroider") || src.includes("dupatta") || src.includes("kurti")) {
+    return "embroidery";
+  }
   return "embroidery";
 }
 
-type CatalogGridProps = {
-  products: Product[];
-};
-
-const CatalogGrid: React.FC<CatalogGridProps> = ({ products }) => {
-  const [category, setCategory] = useState<string>("embroidery");
+export default function CatalogGrid({ products }: { products: Product[] }) {
+  const [category, setCategory] = useState<string>("all");
 
   const filtered = useMemo(() => {
+    if (category === "all") return products;
     return products.filter((p) => inferCategoryKey(p) === category);
   }, [products, category]);
 
@@ -64,8 +65,8 @@ const CatalogGrid: React.FC<CatalogGridProps> = ({ products }) => {
         ))}
       </div>
 
-      {/* Grid of cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5 py-4">
+      {/* Grid of product cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 py-4">
         {filtered.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
@@ -78,6 +79,4 @@ const CatalogGrid: React.FC<CatalogGridProps> = ({ products }) => {
       </div>
     </div>
   );
-};
-
-export default CatalogGrid;
+}
