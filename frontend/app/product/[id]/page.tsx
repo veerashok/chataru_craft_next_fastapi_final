@@ -7,7 +7,7 @@ type PageProps = {
   params: { id: string };
 };
 
-const apiBase = process.env.NEXT_PUBLIC_API_BASE || "";
+
 
 function getImageUrl(image?: string | null): string {
   if (!image) return "/no-image.png";
@@ -59,12 +59,9 @@ export const dynamic = "force-dynamic";
 export default async function ProductPage({ params }: PageProps) {
   const { id } = params;
 
-  if (!apiBase) {
-    console.error("NEXT_PUBLIC_API_BASE is not set");
-  }
 
   // ✅ Use the same endpoint as catalog
-  const res = await fetch(`${apiBase}/api/products`, { cache: "no-store" });
+  const res = await fetch(`api/products`, { cache: "no-store" });
 
   if (!res.ok) {
     return notFound();
