@@ -4,9 +4,6 @@ import { useEffect, useState, FormEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE ??
-  "https://chataru-craft-backend-production.up.railway.app";
 
 type Product = {
   id: number;
@@ -26,7 +23,7 @@ export default function AdminPage() {
   async function login() {
     try {
       setStatus("Logging in…");
-      const res = await fetch(`${API_BASE}/api/admin/login`, {
+      const res = await fetch(`api/admin/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -48,7 +45,7 @@ export default function AdminPage() {
 
   async function logout() {
     try {
-      await fetch(`${API_BASE}/api/admin/logout`, {
+      await fetch(`api/admin/logout`, {
         method: "POST",
         credentials: "include",
       });
@@ -64,7 +61,7 @@ export default function AdminPage() {
   async function loadProducts() {
     try {
       setLoading(true);
-      const res = await fetch(`${API_BASE}/api/products`, {
+      const res = await fetch(`api/products`, {
         credentials: "include",
       });
       if (res.status === 401) {
@@ -95,7 +92,7 @@ export default function AdminPage() {
 
     try {
       setStatus("Adding product…");
-      const res = await fetch(`${API_BASE}/api/admin/products`, {
+      const res = await fetch(`api/admin/products`, {
         method: "POST",
         body: fd,
         credentials: "include",
@@ -121,7 +118,7 @@ export default function AdminPage() {
     const fd = new FormData(form);
     try {
       setStatus("Saving product…");
-      const res = await fetch(`${API_BASE}/api/admin/products/${id}`, {
+      const res = await fetch(`api/admin/products/${id}`, {
         method: "PUT",
         body: fd,
         credentials: "include",
@@ -146,7 +143,7 @@ export default function AdminPage() {
     if (!confirm("Delete this product?")) return;
     try {
       setStatus("Deleting product…");
-      const res = await fetch(`${API_BASE}/api/admin/products/${id}`, {
+      const res = await fetch(`api/admin/products/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
