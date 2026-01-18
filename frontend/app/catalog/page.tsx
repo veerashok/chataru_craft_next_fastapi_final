@@ -4,8 +4,7 @@ import type { Product } from "@/components/ProductCard";
 export const dynamic = "force-dynamic";
 
 export default async function CatalogPage() {
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE as string;
-  const res = await fetch(`${apiBase}/api/products`, { cache: "no-store" });
+  const res = await fetch(`api/products`, { cache: "no-store" });
   const products: Product[] = await res.json();
 
   return (
