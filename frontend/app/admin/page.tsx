@@ -317,7 +317,7 @@ export default function AdminPage() {
                   <td>
                     {p.image && (
                       <img
-                        src={imgUrl}
+                        src={p.image}
                         alt={p.name}
                         className="h-28 w-auto rounded-md object-cover border"
                       />
