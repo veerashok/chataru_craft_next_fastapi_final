@@ -3,11 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Product } from "@/components/ProductCard";
 
+const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+
 type PageProps = {
   params: { id: string };
 };
-
-
 
 function getImageUrl(image?: string | null): string {
   if (!image) return "/no-image.png";
@@ -59,9 +59,7 @@ export const dynamic = "force-dynamic";
 export default async function ProductPage({ params }: PageProps) {
   const { id } = params;
 
-
-  // ✅ Use the same endpoint as catalog
-  const res = await fetch(`api/products`, { cache: "no-store" });
+  const res = await fetch(`${apiBase}/api/products`, { cache: "no-store" });
 
   if (!res.ok) {
     return notFound();
@@ -79,16 +77,17 @@ export default async function ProductPage({ params }: PageProps) {
   const badge = getBadge(product);
 
   const whatsappNumber =
-    process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "91xxxxxxxxxx"; // change this
+    process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "91xxxxxxxxxx";
+
   const waMessage = encodeURIComponent(
     `Hi, I'm interested in "${product.name}" (ID: ${product.id}) from Chataru Craft. Please share details.`
   );
+
   const whatsappLink = `https://wa.me/${whatsappNumber}?text=${waMessage}`;
 
   return (
     <main className="min-h-screen bg-slate-50">
       <div className="container mx-auto max-w-5xl px-3 py-8">
-        {/* Breadcrumb */}
         <nav className="mb-4 text-xs text-slate-500">
           <Link href="/" className="hover:underline">
             Home
@@ -103,7 +102,8 @@ export default async function ProductPage({ params }: PageProps) {
 
         <div className="rounded-2xl bg-white shadow-sm border border-slate-100 p-4 sm:p-6 lg:p-8">
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-start">
-            {/* Image side */}
+            
+            {/* Image Section */}
             <div className="relative">
               {badge && (
                 <div className="absolute left-3 top-3 z-10 rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-semibold text-slate-900 shadow">
@@ -127,7 +127,7 @@ export default async function ProductPage({ params }: PageProps) {
               </p>
             </div>
 
-            {/* Details side */}
+            {/* Product Details */}
             <div className="flex flex-col gap-3">
               <div className="inline-flex items-center w-fit rounded-full bg-amber-50 px-3 py-1 border border-amber-200">
                 <span className="h-1.5 w-1.5 rounded-full bg-amber-500 mr-1.5" />
@@ -140,10 +140,8 @@ export default async function ProductPage({ params }: PageProps) {
                 {product.name}
               </h1>
 
-              <div className="flex items-center gap-3">
-                <div className="text-2xl font-bold text-amber-800">
-                  ₹ {product.price}
-                </div>
+              <div className="text-2xl font-bold text-amber-800">
+                ₹ {product.price}
               </div>
 
               {product.description && (
@@ -186,8 +184,7 @@ export default async function ProductPage({ params }: PageProps) {
         </div>
 
         <div className="mt-8 text-center text-[11px] text-slate-500">
-          © Chataru Craft · Boss Enterprises · Village Lakhe Ka Tala, Ramjan Ki
-          Gafan, Barmer, Rajasthan
+          © Chataru Craft · Boss Enterprises · Village Lakhe Ka Tala, Ramjan Ki Gafan, Barmer, Rajasthan
         </div>
       </div>
     </main>
